@@ -1,19 +1,13 @@
 package com.example.money;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeAll;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.Objects;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ArrayList;
 
 /*
-TODO:
-
+DONE:
 Part 1: Currency Conversion
 - Implement currency converter (rate * amount)
   - Define currencies and their identifiers
@@ -24,6 +18,9 @@ Part 1: Currency Conversion
 - Support multiple banks with different base currencies
   - Represent banks and their published rates
   - Maintain separate rate tables for each bank
+
+  TODO:
+Part 1: Currency Conversion
 - Enable conversion between any two connected currencies
   - Implement path-finding through currency networks
   - Find optimal conversion sequence
@@ -64,6 +61,26 @@ Part 2: Offering Service
   - Determine final customer price
  */
 public class ToDoTest {
+    
+    private static CurrencyConverter uut;
+    private static Bank europeanBank;
+    private static Bank americanBank;
+    
+    @BeforeAll
+    static void setUpAll() {
+        // Create banks
+        europeanBank = new Bank(Currency.EUR);
+        europeanBank.addExchangeRate(Currency.USD, new BigDecimal("1.1"));
+        europeanBank.addExchangeRate(Currency.GBP, new BigDecimal("0.84"));
+        
+        americanBank = new Bank(Currency.USD);
+        americanBank.addExchangeRate(Currency.MXN, new BigDecimal("18.5"));
+        
+        // Create the converter and add banks
+        uut = new CurrencyConverter();
+        uut.addBank(europeanBank);
+        uut.addBank(americanBank);
+    }
 
     @Test
     void currency_hasUniqueCode() {
@@ -82,50 +99,30 @@ public class ToDoTest {
 
     @Test
     void currencyConverter_convertsFromEurToUsd() {
-        Bank europeanBank = new Bank(Currency.EUR);
-        europeanBank.addExchangeRate(Currency.USD, new BigDecimal("1.1"));
-        europeanBank.addExchangeRate(Currency.GBP, new BigDecimal("0.84"));
-        
-        CurrencyConverter converter = new CurrencyConverter();
-        converter.addBank(europeanBank);
-
         Money fromEur = new Money(new BigDecimal("2.00"), Currency.EUR);
         Money expectedUsd = new Money(new BigDecimal("2.20"), Currency.USD);
 
-        Money actualUsd = converter.convert(fromEur, Currency.USD);
+        Money actualUsd = uut.convert(fromEur, Currency.USD);
 
         assertThat(actualUsd).isEqualTo(expectedUsd);
     }
 
     @Test
     void currencyConverter_convertsFromUsdToEur() {
-        Bank europeanBank = new Bank(Currency.EUR);
-        europeanBank.addExchangeRate(Currency.USD, new BigDecimal("1.1"));
-        
-        CurrencyConverter converter = new CurrencyConverter();
-        converter.addBank(europeanBank);
-
         Money fromUsd = new Money(new BigDecimal("2.20"), Currency.USD);
         Money expectedEur = new Money(new BigDecimal("2.00"), Currency.EUR);
 
-        Money actualEur = converter.convert(fromUsd, Currency.EUR);
+        Money actualEur = uut.convert(fromUsd, Currency.EUR);
 
         assertThat(actualEur).isEqualTo(expectedEur);
     }
 
     @Test
     void currencyConverter_convertsFromUsdToGbp() {
-        Bank europeanBank = new Bank(Currency.EUR);
-        europeanBank.addExchangeRate(Currency.USD, new BigDecimal("1.1"));
-        europeanBank.addExchangeRate(Currency.GBP, new BigDecimal("0.84"));
-        
-        CurrencyConverter converter = new CurrencyConverter();
-        converter.addBank(europeanBank);
-
         Money fromUsd = new Money(new BigDecimal("2.20"), Currency.USD);
         Money expectedGbp = new Money(new BigDecimal("1.68"), Currency.GBP);
 
-        Money actualGbp = converter.convert(fromUsd, Currency.GBP);
+        Money actualGbp = uut.convert(fromUsd, Currency.GBP);
 
         assertThat(actualGbp).isEqualTo(expectedGbp);
     }
