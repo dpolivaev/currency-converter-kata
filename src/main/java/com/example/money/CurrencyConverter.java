@@ -15,11 +15,37 @@ public class CurrencyConverter {
             return money;
         }
         
+        // Try direct conversion first
         for (Bank bank : banks) {
             try {
                 return bank.convert(money, targetCurrency);
             } catch (IllegalArgumentException e) {
                 // This bank can't do the conversion, try the next one
+            }
+        }
+        
+        // If direct conversion failed, try using USD as intermediate currency
+        Currency intermediate = Currency.USD;
+        
+        // Step 1: Convert from source to intermediate currency
+        Money intermediateMoney = null;
+        for (Bank bank : banks) {
+            try {
+                intermediateMoney = bank.convert(money, intermediate);
+                break;
+            } catch (IllegalArgumentException e) {
+                // This bank can't do the conversion, try the next one
+            }
+        }
+        
+        // Step 2: Convert from intermediate to target currency
+        if (intermediateMoney != null) {
+            for (Bank bank : banks) {
+                try {
+                    return bank.convert(intermediateMoney, targetCurrency);
+                } catch (IllegalArgumentException e) {
+                    // This bank can't do the conversion, try the next one
+                }
             }
         }
         

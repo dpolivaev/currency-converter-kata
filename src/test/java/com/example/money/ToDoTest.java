@@ -62,15 +62,12 @@ public class ToDoTest {
         Bank europeanBank = new Bank(Currency.EUR);
         europeanBank.addExchangeRate(Currency.USD, new BigDecimal("1.1"));
         
-        Bank asianBank = new Bank(Currency.JPY);
-        asianBank.addExchangeRate(Currency.USD, new BigDecimal("110.0"));
-        
-        // No direct connection between EUR and JPY
-        // Must go through USD: EUR → USD → JPY
+        Bank japaneseBank = new Bank(Currency.JPY);
+        japaneseBank.addExchangeRate(Currency.USD, new BigDecimal("0.00909091"));
         
         CurrencyConverter converter = new CurrencyConverter();
         converter.addBank(europeanBank);
-        converter.addBank(asianBank);
+        converter.addBank(japaneseBank);
         
         Money fromEur = new Money(new BigDecimal("100.00"), Currency.EUR);
         
