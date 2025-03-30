@@ -56,27 +56,4 @@ Part 3: Offering Service
   - Determine final customer price
  */
 public class ToDoTest {
-    @Test
-    void currencyConverter_shouldFindPathBetweenCurrenciesFromDifferentBanks() {
-        // Set up banks with currencies that require multiple hops
-        Bank europeanBank = new Bank(Currency.EUR);
-        europeanBank.addExchangeRate(Currency.USD, new BigDecimal("1.1"));
-        
-        Bank japaneseBank = new Bank(Currency.JPY);
-        japaneseBank.addExchangeRate(Currency.USD, new BigDecimal("0.009091"));
-        
-        CurrencyConverter converter = new CurrencyConverter();
-        converter.addBank(europeanBank);
-        converter.addBank(japaneseBank);
-        
-        Money fromEur = new Money(new BigDecimal("100.00"), Currency.EUR);
-        
-        // 100 EUR → 110 USD → 12,100 JPY
-        Money expectedJpy = new Money(new BigDecimal("12100"), Currency.JPY);
-        
-        Money actualJpy = converter.convert(fromEur, Currency.JPY);
-        
-        assertThat(actualJpy).isEqualTo(expectedJpy);
-    }
-
 }

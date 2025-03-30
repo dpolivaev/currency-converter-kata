@@ -6,23 +6,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.math.BigDecimal;
 
 public class CurrencyConverterTest {
-    public static Bank createEuropeanBank() {
+     
+    public static CurrencyConverter createConverter() {
         Bank europeanBank = new Bank(Currency.EUR);
         europeanBank.addExchangeRate(Currency.USD, new BigDecimal("1.1"));
         europeanBank.addExchangeRate(Currency.GBP, new BigDecimal("0.84"));
-        return europeanBank;
-    }
-    
-    public static Bank createAmericanBank() {
+
         Bank americanBank = new Bank(Currency.USD);
         americanBank.addExchangeRate(Currency.MXN, new BigDecimal("18.5"));
-        return americanBank;
-    }
-    
-    public static CurrencyConverter createConverter() {
+
+        Bank japaneseBank = new Bank(Currency.JPY);
+        japaneseBank.addExchangeRate(Currency.USD, new BigDecimal("0.009091"));
+
         CurrencyConverter converter = new CurrencyConverter();
-        converter.addBank(createEuropeanBank());
-        converter.addBank(createAmericanBank());
+        converter.addBank(europeanBank);
+        converter.addBank(americanBank);
+        converter.addBank(japaneseBank);
         return converter;
     }
     
@@ -57,4 +56,14 @@ public class CurrencyConverterTest {
 
         assertThat(actualGbp).isEqualTo(expectedGbp);
     }
+    @Test
+    void currencyConverter_shouldFindPathBetweenCurrenciesFromDifferentBanks() {
+        Money fromEur = new Money(new BigDecimal("100.00"), Currency.EUR);
+        Money expectedJpy = new Money(new BigDecimal("12100"), Currency.JPY);
+        
+        Money actualJpy = uut.convert(fromEur, Currency.JPY);
+        
+        assertThat(actualJpy).isEqualTo(expectedJpy);
+    }
+
 } 
