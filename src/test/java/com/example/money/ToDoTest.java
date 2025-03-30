@@ -1,5 +1,9 @@
 package com.example.money;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import java.math.BigDecimal;
+import org.junit.jupiter.api.Test;
+
 /*
 DONE:
 Part 1: Currency Conversion
@@ -13,22 +17,19 @@ Part 1: Currency Conversion
   - Represent banks and their published rates
   - Maintain separate rate tables for each bank
 
-TODO:
-Part 1: Currency Conversion
+IN PROGRESS:
+Part 2: Multi-bank Currency Conversion
 - Enable conversion between any two connected currencies
   - Implement path-finding through currency networks
-  - Find optimal conversion sequence
-  - Support multi-hop currency exchange
-- Handle disconnected currencies
+
+BACKLOG:
+  - Find path between currencies with best conversion rate
   - Identify when currencies exist in separate networks
   - Provide meaningful responses for impossible conversions
   - Communicate conversion failure appropriately
 - Optimize conversion performance
-  - Cache conversion rates
-  - Use efficient lookup structures
-  - Ensure thread safety for market operations
 
-Part 2: Offering Service
+Part 3: Offering Service
 - Create purchase requisition processing service
   - Define core business operations
   - Implement requisition fulfillment workflow
@@ -55,5 +56,30 @@ Part 2: Offering Service
   - Determine final customer price
  */
 public class ToDoTest {
-    // Just a placeholder for the TODO list
+    @Test
+    void currencyConverter_shouldFindPathBetweenCurrenciesFromDifferentBanks() {
+        // Set up banks with currencies that require multiple hops
+        Bank europeanBank = new Bank(Currency.EUR);
+        europeanBank.addExchangeRate(Currency.USD, new BigDecimal("1.1"));
+        
+        Bank asianBank = new Bank(Currency.JPY);
+        asianBank.addExchangeRate(Currency.USD, new BigDecimal("110.0"));
+        
+        // No direct connection between EUR and JPY
+        // Must go through USD: EUR → USD → JPY
+        
+        CurrencyConverter converter = new CurrencyConverter();
+        converter.addBank(europeanBank);
+        converter.addBank(asianBank);
+        
+        Money fromEur = new Money(new BigDecimal("100.00"), Currency.EUR);
+        
+        // 100 EUR → 110 USD → 12,100 JPY
+        Money expectedJpy = new Money(new BigDecimal("12100.00"), Currency.JPY);
+        
+        Money actualJpy = converter.convert(fromEur, Currency.JPY);
+        
+        assertThat(actualJpy).isEqualTo(expectedJpy);
+    }
+
 }
