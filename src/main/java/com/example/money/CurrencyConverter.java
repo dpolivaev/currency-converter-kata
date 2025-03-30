@@ -2,6 +2,7 @@ package com.example.money;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Optional;
 
 public class CurrencyConverter {
     private List<Bank> banks = new ArrayList<>();
@@ -15,36 +16,28 @@ public class CurrencyConverter {
             return money;
         }
         
-        // Try direct conversion first
         for (Bank bank : banks) {
-            try {
-                return bank.convert(money, targetCurrency);
-            } catch (IllegalArgumentException e) {
-                // This bank can't do the conversion, try the next one
+            Optional<Money> result = bank.convert(money, targetCurrency);
+            if (result.isPresent()) {
+                return result.get();
             }
         }
         
-        // If direct conversion failed, try using USD as intermediate currency
         Currency intermediate = Currency.USD;
         
-        // Step 1: Convert from source to intermediate currency
-        Money intermediateMoney = null;
+        Optional<Money> intermediateMoney = Optional.empty();
         for (Bank bank : banks) {
-            try {
-                intermediateMoney = bank.convert(money, intermediate);
+            intermediateMoney = bank.convert(money, intermediate);
+            if (intermediateMoney.isPresent()) {
                 break;
-            } catch (IllegalArgumentException e) {
-                // This bank can't do the conversion, try the next one
             }
         }
         
-        // Step 2: Convert from intermediate to target currency
-        if (intermediateMoney != null) {
+        if (intermediateMoney.isPresent()) {
             for (Bank bank : banks) {
-                try {
-                    return bank.convert(intermediateMoney, targetCurrency);
-                } catch (IllegalArgumentException e) {
-                    // This bank can't do the conversion, try the next one
+                Optional<Money> result = bank.convert(intermediateMoney.get(), targetCurrency);
+                if (result.isPresent()) {
+                    return result.get();
                 }
             }
         }

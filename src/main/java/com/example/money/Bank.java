@@ -5,6 +5,7 @@ import java.math.RoundingMode;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.Optional;
 
 public class Bank {
     private Currency baseCurrency;
@@ -48,10 +49,10 @@ public class Bank {
         rateCache.put(new CurrencyPair(currency, baseCurrency), inverseRate);
     }
     
-    public BigDecimal getExchangeRate(Currency from, Currency to) {
+    public Optional<BigDecimal> getExchangeRate(Currency from, Currency to) {
         CurrencyPair pair = new CurrencyPair(from, to);
         if (rateCache.containsKey(pair)) {
-            return rateCache.get(pair);
+            return Optional.of(rateCache.get(pair));
         }
         
         if (from != baseCurrency && to != baseCurrency) {
@@ -59,16 +60,16 @@ public class Bank {
             BigDecimal baseToTo = rateCache.get(new CurrencyPair(baseCurrency, to));
             
             if (fromToBase != null && baseToTo != null) {
-                return fromToBase.multiply(baseToTo)
-                    .setScale(10, RoundingMode.HALF_EVEN);
+                return Optional.of(fromToBase.multiply(baseToTo)
+                    .setScale(10, RoundingMode.HALF_EVEN));
             }
         }
         
-        throw new IllegalArgumentException("Cannot convert from " + from + " to " + to);
+        return Optional.empty();
     }
     
-    public Money convert(Money money, Currency targetCurrency) {
-        BigDecimal rate = getExchangeRate(money.currency(), targetCurrency);
-        return money.convert(rate, targetCurrency);
+    public Optional<Money> convert(Money money, Currency targetCurrency) {
+        return getExchangeRate(money.currency(), targetCurrency)
+            .map(rate -> money.convert(rate, targetCurrency));
     }
 } 

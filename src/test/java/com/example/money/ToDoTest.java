@@ -1,9 +1,5 @@
 package com.example.money;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import java.math.BigDecimal;
-import org.junit.jupiter.api.Test;
-
 /*
 DONE:
 Part 1: Currency Conversion
