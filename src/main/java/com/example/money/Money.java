@@ -39,7 +39,7 @@ public class Money {
 
     public Money convert(BigDecimal rateValue, Currency to) {
         return new Money(amount.multiply(rateValue)
-                .setScale(amount.scale(), RoundingMode.HALF_EVEN), to);
+                .setScale(amount.scale() + to.scale - currency.scale, RoundingMode.HALF_EVEN), to);
     }
 
     @Override

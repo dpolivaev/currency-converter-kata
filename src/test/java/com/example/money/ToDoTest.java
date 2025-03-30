@@ -63,7 +63,7 @@ public class ToDoTest {
         europeanBank.addExchangeRate(Currency.USD, new BigDecimal("1.1"));
         
         Bank japaneseBank = new Bank(Currency.JPY);
-        japaneseBank.addExchangeRate(Currency.USD, new BigDecimal("0.00909091"));
+        japaneseBank.addExchangeRate(Currency.USD, new BigDecimal("0.009091"));
         
         CurrencyConverter converter = new CurrencyConverter();
         converter.addBank(europeanBank);
@@ -72,7 +72,7 @@ public class ToDoTest {
         Money fromEur = new Money(new BigDecimal("100.00"), Currency.EUR);
         
         // 100 EUR → 110 USD → 12,100 JPY
-        Money expectedJpy = new Money(new BigDecimal("12100.00"), Currency.JPY);
+        Money expectedJpy = new Money(new BigDecimal("12100"), Currency.JPY);
         
         Money actualJpy = converter.convert(fromEur, Currency.JPY);
         
