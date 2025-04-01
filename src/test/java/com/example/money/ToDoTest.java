@@ -17,6 +17,11 @@ IN PROGRESS:
 Part 2: Multi-bank Currency Conversion
 - Enable conversion between any two connected currencies
   - Implement path-finding through currency networks
+    - Convert 10 EUR to 12100 JPY using a list of banks
+      - Find path: EUR(European bank) → USD(European bank, Japanese bank) → JPY(Japanese bank)
+        - Find all currencies directly convertible from EUR
+          - Find all banks that work with given currency (EUR) => European bank
+          - Find all their currencies
 
 BACKLOG:
   - Find path between currencies with best conversion rate
@@ -53,11 +58,6 @@ Part 3: Offering Service
  */
 public class ToDoTest {
 
-  // Task: given list of banks, currency converter converts 10 EUR to 12100 JPY
-  // subtask: find path EUR(european bank)  -> USD(european bank, japanese bank) -> JPY(japanese bank)
-  // -------------------------------------------
-  // -Find all currencies directly convertable from EUR
-  //  - Find all banks that can work with given currency (EUR) => european bank
-  //  - Find all their currencies
+  
   
 }
