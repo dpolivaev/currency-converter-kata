@@ -52,4 +52,12 @@ Part 3: Offering Service
   - Determine final customer price
  */
 public class ToDoTest {
+
+  // Task: given list of banks, currency converter converts 10 EUR to 12100 JPY
+  // subtask: find path EUR(european bank)  -> USD(european bank, japanese bank) -> JPY(japanese bank)
+  // -------------------------------------------
+  // -Find all currencies directly convertable from EUR
+  //  - Find all banks that can work with given currency (EUR) => european bank
+  //  - Find all their currencies
+  
 }

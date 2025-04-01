@@ -4,10 +4,11 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 
 public class CurrencyConverterTest {
      
-    public static CurrencyConverter createConverter() {
+    private static CurrencyConverter createConverter() {
         Bank europeanBank = new Bank(Currency.EUR);
         europeanBank.addExchangeRate(Currency.USD, new BigDecimal("1.1"));
         europeanBank.addExchangeRate(Currency.GBP, new BigDecimal("0.84"));
@@ -64,6 +65,16 @@ public class CurrencyConverterTest {
         Money actualJpy = uut.convert(fromEur, Currency.JPY);
         
         assertThat(actualJpy).isEqualTo(expectedJpy);
+    }
+    @Test
+    void currencyConverter_shouldFindAllCurrenciesDirectlyConvertableFromEUR() {
+        Collection<Currency> convertableCurrencies = uut.findDirectlyConvertableCurrencies(Currency.EUR);
+        assertThat(convertableCurrencies).containsExactlyInAnyOrder(Currency.GBP, Currency.USD);
+    }
+    @Test
+    void currencyConverter_shouldFindAllCurrenciesDirectlyConvertableFromUSD() {
+        Collection<Currency> convertableCurrencies = uut.findDirectlyConvertableCurrencies(Currency.USD);
+        assertThat(convertableCurrencies).containsExactlyInAnyOrder(Currency.EUR, Currency.GBP, Currency.MXN, Currency.JPY);
     }
 
 } 

@@ -4,12 +4,15 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 public class Bank {
-    private Currency baseCurrency;
-    private Map<CurrencyPair, BigDecimal> rateCache = new HashMap<>();
+    private final Currency baseCurrency;
+    private final Set<Currency> bankCurrencies = new HashSet<>();
+    private final Map<CurrencyPair, BigDecimal> rateCache = new HashMap<>();
     
     public static class CurrencyPair {
         private final Currency from;
@@ -36,6 +39,7 @@ public class Bank {
     
     public Bank(Currency baseCurrency) {
         this.baseCurrency = baseCurrency;
+        bankCurrencies.add(baseCurrency);
         rateCache.put(new CurrencyPair(baseCurrency, baseCurrency), BigDecimal.ONE);
     }
     
@@ -44,6 +48,7 @@ public class Bank {
     }
     
     public void addExchangeRate(Currency currency, BigDecimal rate) {
+        bankCurrencies.add(currency);
         rateCache.put(new CurrencyPair(baseCurrency, currency), rate);
         BigDecimal inverseRate = BigDecimal.ONE.divide(rate, 10, RoundingMode.HALF_EVEN);
         rateCache.put(new CurrencyPair(currency, baseCurrency), inverseRate);
@@ -71,5 +76,9 @@ public class Bank {
     public Optional<Money> convert(Money money, Currency targetCurrency) {
         return getExchangeRate(money.currency(), targetCurrency)
             .map(rate -> money.convert(rate, targetCurrency));
+    }
+
+    public Set<Currency> convertableCurrencies() {
+        return bankCurrencies;
     }
 } 

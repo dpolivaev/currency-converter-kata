@@ -2,7 +2,11 @@ package com.example.money;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class CurrencyConverter {
     private List<Bank> banks = new ArrayList<>();
@@ -44,5 +48,15 @@ public class CurrencyConverter {
         
         throw new IllegalArgumentException(
             "No exchange rate found for " + money.currency() + " to " + targetCurrency);
+    }
+
+    public Collection<Currency> findDirectlyConvertableCurrencies(Currency currency) {
+        Set<Currency> currencies = banks.stream()
+            .map(bank -> bank.convertableCurrencies())
+            .filter(x -> x.contains(currency))
+            .flatMap(Collection::stream)
+            .collect(Collectors.toSet());
+            currencies.remove(currency);
+        return currencies;
     }
 } 
