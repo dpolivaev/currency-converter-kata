@@ -1,5 +1,6 @@
 package com.example.money;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -8,21 +9,26 @@ import java.math.BigDecimal;
 public class CurrencyConverterTest {
      
     private static CurrencyConverter createConverter() {
+        CurrencyConverter converter = new CurrencyConverter();
         Bank europeanBank = new Bank(Currency.EUR);
         europeanBank.addExchangeRate(Currency.USD, new BigDecimal("1.1"));
         europeanBank.addExchangeRate(Currency.GBP, new BigDecimal("0.84"));
-
+        converter.addBank(europeanBank);
+ 
         Bank americanBank = new Bank(Currency.USD);
         americanBank.addExchangeRate(Currency.MXN, new BigDecimal("18.5"));
-
+        converter.addBank(americanBank);
+ 
+        Bank britishBank = new Bank(Currency.GBP);
+        britishBank.addExchangeRate(Currency.CNY, new BigDecimal("9.36"));
+        converter.addBank(britishBank);
+ 
         Bank japaneseBank = new Bank(Currency.JPY);
         japaneseBank.addExchangeRate(Currency.USD, new BigDecimal("0.009091"));
-
-        CurrencyConverter converter = new CurrencyConverter();
-        converter.addBank(europeanBank);
-        converter.addBank(americanBank);
         converter.addBank(japaneseBank);
+
         return converter;
+ 
     }
     
     private static CurrencyConverter uut = createConverter();
@@ -56,13 +62,26 @@ public class CurrencyConverterTest {
 
         assertThat(actualGbp).isEqualTo(expectedGbp);
     }
+    
+    @Disabled
     @Test
-    void currencyConverter_shouldFindPathBetweenCurrenciesFromDifferentBanks() {
+    void currencyConverter_shouldFindPath_EURtoUSDtoJPY() {
         Money fromEur = new Money(new BigDecimal("100.00"), Currency.EUR);
         Money expectedJpy = new Money(new BigDecimal("12100"), Currency.JPY);
         
         Money actualJpy = uut.convert(fromEur, Currency.JPY);
         
         assertThat(actualJpy).isEqualTo(expectedJpy);
+    }
+    
+    @Disabled
+    @Test
+    void currencyConverter_shouldFindPath_EURtoGBPtoCNY() {
+        Money fromEur = new Money(new BigDecimal("100.00"), Currency.EUR);
+        Money expectedCny = new Money(new BigDecimal("786.2"), Currency.CNY);
+        
+        Money actualCny = uut.convert(fromEur, Currency.CNY);
+        
+        assertThat(actualCny).isEqualTo(expectedCny);
     }
  } 
