@@ -14,6 +14,8 @@ Part 1: Currency Conversion
   - Maintain separate rate tables for each bank
 
 IN PROGRESS:
+- Replace CurrencyPairs by enclosed enum maps for speed
+
 Part 2: Multi-bank Currency Conversion
 - Enable conversion between any two connected currencies
   - Implement path-finding through currency networks

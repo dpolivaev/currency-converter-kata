@@ -3,44 +3,24 @@ package com.example.money;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Map;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Objects;
+import java.util.EnumMap;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 
 public class Bank {
     private final Currency baseCurrency;
-    private final Set<Currency> bankCurrencies = new HashSet<>();
-    private final Map<CurrencyPair, BigDecimal> rateCache = new HashMap<>();
-    
-    public static class CurrencyPair {
-        private final Currency from;
-        private final Currency to;
-
-        public CurrencyPair(Currency from, Currency to) {
-            this.from = from;
-            this.to = to;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            CurrencyPair that = (CurrencyPair) o;
-            return from == that.from && to == that.to;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(from, to);
-        }
-    }
+    private final Map<Currency, Map<Currency, BigDecimal>> rateCache;
     
     public Bank(Currency baseCurrency) {
         this.baseCurrency = baseCurrency;
-        bankCurrencies.add(baseCurrency);
-        rateCache.put(new CurrencyPair(baseCurrency, baseCurrency), BigDecimal.ONE);
+        this.rateCache = new EnumMap<>(Currency.class);
+        computeExchangeRateIfAbsent(baseCurrency , baseCurrency, () -> BigDecimal.ONE);
+    }
+
+    private BigDecimal computeExchangeRateIfAbsent(Currency baseCurrency, Currency targetCurrency, Supplier<BigDecimal> rateValueSupplier) {
+        return rateCache.computeIfAbsent(baseCurrency, x -> new EnumMap<>(Currency.class))
+        .computeIfAbsent(targetCurrency, x -> rateValueSupplier.get());
     }
     
     public Currency getBaseCurrency() {
@@ -48,29 +28,26 @@ public class Bank {
     }
     
     public void addExchangeRate(Currency currency, BigDecimal rate) {
-        bankCurrencies.add(currency);
-        rateCache.put(new CurrencyPair(baseCurrency, currency), rate);
+        computeExchangeRateIfAbsent(baseCurrency, currency, () -> rate);
         BigDecimal inverseRate = BigDecimal.ONE.divide(rate, 10, RoundingMode.HALF_EVEN);
-        rateCache.put(new CurrencyPair(currency, baseCurrency), inverseRate);
-    }
+        computeExchangeRateIfAbsent(currency, baseCurrency, () -> inverseRate);
+ 
+     }
     
     public Optional<BigDecimal> getExchangeRate(Currency from, Currency to) {
-        CurrencyPair pair = new CurrencyPair(from, to);
-        if (rateCache.containsKey(pair)) {
-            return Optional.of(rateCache.get(pair));
-        }
-        
-        if (from != baseCurrency && to != baseCurrency) {
-            BigDecimal fromToBase = rateCache.get(new CurrencyPair(from, baseCurrency));
-            BigDecimal baseToTo = rateCache.get(new CurrencyPair(baseCurrency, to));
-            
-            if (fromToBase != null && baseToTo != null) {
-                return Optional.of(fromToBase.multiply(baseToTo)
-                    .setScale(10, RoundingMode.HALF_EVEN));
-            }
-        }
-        
-        return Optional.empty();
+        return Optional.ofNullable(computeExchangeRateIfAbsent(from, to, () -> {
+            if(from == baseCurrency || to == baseCurrency)
+                return null;
+                BigDecimal fromToBase = rateCache.get(from).get(baseCurrency);
+                BigDecimal baseToTo = rateCache.get(baseCurrency).get(to);
+                if (fromToBase != null && baseToTo != null) {
+                    return fromToBase.multiply(baseToTo)
+                        .setScale(10, RoundingMode.HALF_EVEN);
+                }
+                else
+                    return null;
+        }));
+          
     }
     
     public Optional<Money> convert(Money money, Currency targetCurrency) {
@@ -79,6 +56,6 @@ public class Bank {
     }
 
     public Set<Currency> convertableCurrencies() {
-        return bankCurrencies;
+        return rateCache.keySet();
     }
 } 
