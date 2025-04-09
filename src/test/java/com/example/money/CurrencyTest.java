@@ -6,7 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class CurrencyTest {
     
     @Test
-    void currency_hasUniqueCode() {
+    void hasUniqueCode() {
         Currency usd = Currency.USD;
         assertThat(usd.code()).isEqualTo("USD");
     }

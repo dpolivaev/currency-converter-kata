@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 public class MoneyTest {
     
     @Test
-    void money_combinesAmountAndCurrency() {
+    void combinesAmountAndCurrency() {
         Money tenDollars = new Money(new BigDecimal("10"), Currency.USD);
 
         assertThat(tenDollars.amount()).isEqualTo(new BigDecimal("10"));
@@ -17,7 +17,7 @@ public class MoneyTest {
     }
 
     @Test
-    void money_convertsFromUsdToJpy() {
+    void convertsFromUsdToJpy() {
         Money tenUsd = new Money(new BigDecimal("10.00"), Currency.USD);
         BigDecimal usdToJpyRate = new BigDecimal("110");
         Money convertedJpy = tenUsd.convert(usdToJpyRate, Currency.JPY);

@@ -34,7 +34,7 @@ public class CurrencyConverterTest {
     private static CurrencyConverter uut = createConverter();
 
     @Test
-    void currencyConverter_convertsFromEurToUsd() {
+    void convertsFromEurToUsd() {
         Money fromEur = new Money(new BigDecimal("2.00"), Currency.EUR);
         Money expectedUsd = new Money(new BigDecimal("2.20"), Currency.USD);
 
@@ -43,8 +43,9 @@ public class CurrencyConverterTest {
         assertThat(actualUsd).isEqualTo(expectedUsd);
     }
 
+    
     @Test
-    void currencyConverter_convertsFromUsdToEur() {
+    void convertsFromUsdToEur() {
         Money fromUsd = new Money(new BigDecimal("2.20"), Currency.USD);
         Money expectedEur = new Money(new BigDecimal("2.00"), Currency.EUR);
 
@@ -54,7 +55,7 @@ public class CurrencyConverterTest {
     }
 
     @Test
-    void currencyConverter_convertsFromUsdToGbp() {
+    void convertsFromUsdToGbp() {
         Money fromUsd = new Money(new BigDecimal("2.20"), Currency.USD);
         Money expectedGbp = new Money(new BigDecimal("1.68"), Currency.GBP);
 
@@ -65,7 +66,7 @@ public class CurrencyConverterTest {
     
     @Disabled
     @Test
-    void currencyConverter_shouldFindPath_EURtoUSDtoJPY() {
+    void shouldFindPath_EURtoUSDtoJPY() {
         Money fromEur = new Money(new BigDecimal("100.00"), Currency.EUR);
         Money expectedJpy = new Money(new BigDecimal("12100"), Currency.JPY);
         
@@ -76,7 +77,7 @@ public class CurrencyConverterTest {
     
     @Disabled
     @Test
-    void currencyConverter_shouldFindPath_EURtoGBPtoCNY() {
+    void shouldFindPath_EURtoGBPtoCNY() {
         Money fromEur = new Money(new BigDecimal("100.00"), Currency.EUR);
         Money expectedCny = new Money(new BigDecimal("786.2"), Currency.CNY);
         
