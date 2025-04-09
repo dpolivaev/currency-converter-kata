@@ -5,28 +5,27 @@ import java.math.RoundingMode;
 import java.util.Map;
 import java.util.EnumMap;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Supplier;
 
 public class Bank {
     private final Currency baseCurrency;
     private final Map<Currency, Map<Currency, BigDecimal>> rateCache;
     
+    public Bank() {
+        this.baseCurrency = null;
+        this.rateCache = new EnumMap<>(Currency.class);
+    }
     public Bank(Currency baseCurrency) {
         this.baseCurrency = baseCurrency;
         this.rateCache = new EnumMap<>(Currency.class);
         computeExchangeRateIfAbsent(baseCurrency , baseCurrency, () -> BigDecimal.ONE);
     }
 
-    private BigDecimal computeExchangeRateIfAbsent(Currency baseCurrency, Currency targetCurrency, Supplier<BigDecimal> rateValueSupplier) {
+    BigDecimal computeExchangeRateIfAbsent(Currency baseCurrency, Currency targetCurrency, Supplier<BigDecimal> rateValueSupplier) {
         return rateCache.computeIfAbsent(baseCurrency, x -> new EnumMap<>(Currency.class))
         .computeIfAbsent(targetCurrency, x -> rateValueSupplier.get());
     }
-    
-    public Currency getBaseCurrency() {
-        return baseCurrency;
-    }
-    
+      
     public void addExchangeRate(Currency currency, BigDecimal rate) {
         computeExchangeRateIfAbsent(baseCurrency, currency, () -> rate);
         BigDecimal inverseRate = BigDecimal.ONE.divide(rate, 10, RoundingMode.HALF_EVEN);
@@ -53,9 +52,5 @@ public class Bank {
     public Optional<Money> convert(Money money, Currency targetCurrency) {
         return getExchangeRate(money.currency(), targetCurrency)
             .map(rate -> money.convert(rate, targetCurrency));
-    }
-
-    public Set<Currency> convertableCurrencies() {
-        return rateCache.keySet();
     }
 } 

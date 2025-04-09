@@ -12,20 +12,17 @@ Part 1: Currency Conversion
 - Support multiple banks with different base currencies
   - Represent banks and their published rates
   - Maintain separate rate tables for each bank
-
-IN PROGRESS:
+  - Convert 10 EUR to 12100 JPY using a list of banks
 - Replace CurrencyPairs by enclosed enum maps for speed
 
+COMMIT:
+- Cache conversion rates in CurrencyConverter multibank
+
+BACKLOG:
 Part 2: Multi-bank Currency Conversion
 - Enable conversion between any two connected currencies
   - Implement path-finding through currency networks
     - Convert 10 EUR to 12100 JPY using a list of banks
-      - Find path: EUR(European bank) → USD(European bank, Japanese bank) → JPY(Japanese bank)
-        - Find all currencies directly convertible from EUR
-          - Find all banks that work with given currency (EUR) => European bank
-          - Find all their currencies
-
-BACKLOG:
   - Find path between currencies with best conversion rate
   - Identify when currencies exist in separate networks
   - Provide meaningful responses for impossible conversions

@@ -1,15 +1,13 @@
 package com.example.money;
 
 import java.util.List;
+import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class CurrencyConverter {
-    private List<Bank> banks = new ArrayList<>();
+    private final List<Bank> banks = new ArrayList<>();
+    private final Bank multiBank = new Bank();
     
     public void addBank(Bank bank) {
         banks.add(bank);
@@ -19,44 +17,39 @@ public class CurrencyConverter {
         if (money.currency() == targetCurrency) {
             return money;
         }
-        
-        for (Bank bank : banks) {
-            Optional<Money> result = bank.convert(money, targetCurrency);
-            if (result.isPresent()) {
-                return result.get();
-            }
-        }
-        
-        Currency intermediate = Currency.USD;
-        
-        Optional<Money> intermediateMoney = Optional.empty();
-        for (Bank bank : banks) {
-            intermediateMoney = bank.convert(money, intermediate);
-            if (intermediateMoney.isPresent()) {
-                break;
-            }
-        }
-        
-        if (intermediateMoney.isPresent()) {
+
+        multiBank.computeExchangeRateIfAbsent(money.currency(), targetCurrency, () -> {
             for (Bank bank : banks) {
-                Optional<Money> result = bank.convert(intermediateMoney.get(), targetCurrency);
+                Optional<BigDecimal> result = bank.getExchangeRate(money.currency(), targetCurrency);
                 if (result.isPresent()) {
                     return result.get();
                 }
             }
-        }
-        
-        throw new IllegalArgumentException(
-            "No exchange rate found for " + money.currency() + " to " + targetCurrency);
-    }
+            
+            Currency intermediate = Currency.USD;
+            
+            Optional<BigDecimal> intermediateRate = Optional.empty();
+            for (Bank bank : banks) {
+                intermediateRate = bank.getExchangeRate(money.currency(), intermediate);
+                if (intermediateRate.isPresent()) {
+                    break;
+                }
+            }
+            
+            if (intermediateRate.isPresent()) {
+                for (Bank bank : banks) {
+                    Optional<BigDecimal> result = bank.getExchangeRate(intermediate, targetCurrency);
+                    if (result.isPresent()) {
+                        return intermediateRate.get().multiply(result.get());
+                    }
+                }
+            }
+            return null;
+        });
 
-    public Collection<Currency> findDirectlyConvertableCurrencies(Currency currency) {
-        Set<Currency> currencies = banks.stream()
-            .map(bank -> bank.convertableCurrencies())
-            .filter(x -> x.contains(currency))
-            .flatMap(Collection::stream)
-            .collect(Collectors.toSet());
-            currencies.remove(currency);
-        return currencies;
-    }
+        return multiBank.convert(money, targetCurrency)
+        .orElseThrow(() -> new IllegalArgumentException(
+            "No exchange rate found for " + money.currency() + " to " + targetCurrency));
+       
+     }
 } 

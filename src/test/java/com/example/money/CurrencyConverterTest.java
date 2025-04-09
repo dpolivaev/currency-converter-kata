@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
-import java.util.Collection;
 
 public class CurrencyConverterTest {
      
@@ -66,15 +65,4 @@ public class CurrencyConverterTest {
         
         assertThat(actualJpy).isEqualTo(expectedJpy);
     }
-    @Test
-    void currencyConverter_shouldFindAllCurrenciesDirectlyConvertableFromEUR() {
-        Collection<Currency> convertableCurrencies = uut.findDirectlyConvertableCurrencies(Currency.EUR);
-        assertThat(convertableCurrencies).containsExactlyInAnyOrder(Currency.GBP, Currency.USD);
-    }
-    @Test
-    void currencyConverter_shouldFindAllCurrenciesDirectlyConvertableFromUSD() {
-        Collection<Currency> convertableCurrencies = uut.findDirectlyConvertableCurrencies(Currency.USD);
-        assertThat(convertableCurrencies).containsExactlyInAnyOrder(Currency.EUR, Currency.GBP, Currency.MXN, Currency.JPY);
-    }
-
-} 
+ } 
