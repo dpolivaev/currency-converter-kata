@@ -6,7 +6,7 @@ Implement a currency converter to support international trading. The converter m
 
 `Y = rate * X` where `X` is the purchase price,  and`rate` is the exchange rate between source and target currencies.
 
-Currency exchange rates are provided by `N` partner banks. Each bank publishes a list of exchange rates for various currencies, using a different base currency. For example:
+Currency exchange rates are provided by `N` partner banks. Each bank publishes a list of exchange rates for various currencies, using their own base currency. For example:
 
 - Bank A might define rates relative to **1 USD**,
 - Bank B might define rates relative to **1 RUB**.
