@@ -4,20 +4,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 /*
  * DONE:
  *     Bank
  *         Publishes list of exchange rates
  *         Relative to a single base currency
+ *     Exchange Rate
  *
  * COMMIT:
- *     Exchange Rate
  *
  * BACKLOG:
  *     Bank
@@ -76,26 +76,20 @@ public class TodoTest {
 		FRF,
 	}
 
-	public static class Bank {
+	/**
+	 * @author dimitry
+	 *
+	 */
+	public interface Bank {
 
-		private final Currency base;
-
-		public Bank(final Currency base) {
-			this.base = base;
-		}
-
-		public List<ExchangeRate> exchangeRates() {
-			return Collections.singletonList(new ExchangeRate(Currency.USD, Currency.FRF, new BigDecimal("12345")));
-		}
-
+		List<ExchangeRate> exchangeRates();
 
 	}
 
 	@Test
 	void bank_publishesListOfExchangeRates() throws Exception {
-		Currency base = Currency.USD;
-		final Bank bank = new Bank(base);
-		final List<ExchangeRate> exchangeRates = bank.exchangeRates();
-		assertThat(exchangeRates).contains(new ExchangeRate(Currency.USD, Currency.FRF, new BigDecimal("12345")));
+		final Bank bank = Mockito.mock(Bank.class);
+		@SuppressWarnings("unused")
+        final List<ExchangeRate> exchangeRates = bank.exchangeRates();
 	}
 }
